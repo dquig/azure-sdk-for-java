@@ -35,10 +35,13 @@ import javax.ws.rs.core.MediaType;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
 import com.microsoft.windowsazure.services.servicebus.models.AbstractListOptions;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.windowsazure.services.servicebus.models.CreateEventHubResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateRuleResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateSubscriptionResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateTopicResult;
+import com.microsoft.windowsazure.services.servicebus.models.EventHubInfo;
+import com.microsoft.windowsazure.services.servicebus.models.GetEventHubResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetRuleResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetSubscriptionResult;
@@ -164,7 +167,7 @@ public class ServiceBusRestProxy implements ServiceBusContract {
 
     private WebResource getResource() {
         WebResource resource = getChannel().resource(uri).queryParam(
-                "api-version", "2013-07");
+                "api-version", "2014-01");
         for (ClientFilter filter : filters) {
             resource.addFilter(filter);
         }
@@ -332,6 +335,52 @@ public class ServiceBusRestProxy implements ServiceBusContract {
     @Override
     public void deleteMessage(BrokeredMessage message) throws ServiceException {
         getChannel().resource(message.getLockLocation()).delete();
+    }
+
+    @Override
+    public CreateEventHubResult createEventHub(EventHubInfo eventHubInfo) throws ServiceException {
+        Builder webResourceBuilder = getResource().path(eventHubInfo.getPath())
+                .type("application/atom+xml;type=entry;charset=utf-8");
+        return new CreateEventHubResult(webResourceBuilder.put(EventHubInfo.class,
+                eventHubInfo));
+    }
+
+    @Override
+    public void deleteEventHub(String eventHubPath) throws ServiceException {
+        getResource().path(eventHubPath).delete();
+    }
+
+    @Override
+    public GetEventHubResult getEventHub(String eventHubPath) throws ServiceException {
+        return new GetEventHubResult(getResource().path(eventHubPath).get(
+                EventHubInfo.class));
+    }
+
+
+/*    @Override
+    public ListEventHubsResult listEventHubs() throws ServiceException {
+        return listEventHubs(ListEventHubsOptions.DEFAULT);
+    }
+
+    @Override
+    public ListEventHubsResult listEventHubs(ListEventHubsOptions options) throws ServiceException {
+        Feed feed = listOptions(options,
+                getResource().path("$Resources/EventHubs")).get(Feed.class);
+        ArrayList<EventHubInfo> eventHubs = new ArrayList<EventHubInfo>();
+        for (Entry entry : feed.getEntries()) {
+            eventHubs.add(new EventHubInfo(entry));
+        }
+        ListEventHubsResult result = new ListEventHubsResult();
+        result.setItems(eventHubs);
+        return result;
+    }*/
+
+    @Override
+    public EventHubInfo updateEventHub(EventHubInfo eventHubInfo) throws ServiceException {
+        Builder webResourceBuilder = getResource().path(eventHubInfo.getPath())
+                .type("application/atom+xml;type=entry;charset=utf-8")
+                .header("If-Match", "*");
+        return webResourceBuilder.put(EventHubInfo.class, eventHubInfo);
     }
 
     @Override

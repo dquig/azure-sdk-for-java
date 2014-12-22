@@ -22,15 +22,14 @@ import com.microsoft.windowsazure.exception.ServiceExceptionFactory;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.windowsazure.services.servicebus.models.CreateEventHubResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateRuleResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateSubscriptionResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateTopicResult;
+import com.microsoft.windowsazure.services.servicebus.models.EventHubInfo;
+import com.microsoft.windowsazure.services.servicebus.models.GetEventHubResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetRuleResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetSubscriptionResult;
@@ -51,6 +50,10 @@ import com.microsoft.windowsazure.services.servicebus.models.ReceiveSubscription
 import com.microsoft.windowsazure.services.servicebus.models.RuleInfo;
 import com.microsoft.windowsazure.services.servicebus.models.SubscriptionInfo;
 import com.microsoft.windowsazure.services.servicebus.models.TopicInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
@@ -195,6 +198,72 @@ public class ServiceBusExceptionProcessor implements ServiceBusContract {
     public void deleteMessage(BrokeredMessage message) throws ServiceException {
         try {
             next.deleteMessage(message);
+        } catch (UniformInterfaceException e) {
+            throw processCatch(new ServiceException(e));
+        } catch (ClientHandlerException e) {
+            throw processCatch(new ServiceException(e));
+        }
+    }
+
+    @Override
+    public CreateEventHubResult createEventHub(EventHubInfo eventHubInfo) throws ServiceException {
+        try {
+            return next.createEventHub(eventHubInfo);
+        } catch (UniformInterfaceException e) {
+            throw processCatch(new ServiceException(e));
+        } catch (ClientHandlerException e) {
+            throw processCatch(new ServiceException(e));
+        }
+    }
+
+    @Override
+    public void deleteEventHub(String eventHubPath) throws ServiceException {
+       try {
+            next.deleteEventHub(eventHubPath);
+        } catch (UniformInterfaceException e) {
+            throw processCatch(new ServiceException(e));
+        } catch (ClientHandlerException e) {
+            throw processCatch(new ServiceException(e));
+        }
+    }
+
+    @Override
+    public GetEventHubResult getEventHub(String eventHubPath) throws ServiceException {
+       try {
+            return next.getEventHub(eventHubPath);
+        } catch (UniformInterfaceException e) {
+            throw processCatch(new ServiceException(e));
+        } catch (ClientHandlerException e) {
+            throw processCatch(new ServiceException(e));
+        }
+    }
+
+/*    @Override
+    public ListEventHubsResult listEventHubs() throws ServiceException {
+       try {
+            return next.listEventHubs();
+        } catch (UniformInterfaceException e) {
+            throw processCatch(new ServiceException(e));
+        } catch (ClientHandlerException e) {
+            throw processCatch(new ServiceException(e));
+        }
+    }
+
+    @Override
+    public ListEventHubsResult listEventHubs(ListEventHubsOptions options) throws ServiceException {
+       try {
+            return next.listEventHubs(options);
+        } catch (UniformInterfaceException e) {
+            throw processCatch(new ServiceException(e));
+        } catch (ClientHandlerException e) {
+            throw processCatch(new ServiceException(e));
+        }
+    }*/
+
+    @Override
+    public EventHubInfo updateEventHub(EventHubInfo eventHubInfo) throws ServiceException {
+       try {
+            return next.updateEventHub(eventHubInfo);
         } catch (UniformInterfaceException e) {
             throw processCatch(new ServiceException(e));
         } catch (ClientHandlerException e) {

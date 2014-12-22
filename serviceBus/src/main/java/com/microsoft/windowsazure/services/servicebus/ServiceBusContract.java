@@ -17,10 +17,13 @@ package com.microsoft.windowsazure.services.servicebus;
 import com.microsoft.windowsazure.core.pipeline.jersey.JerseyFilterableService;
 import com.microsoft.windowsazure.exception.ServiceException;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.windowsazure.services.servicebus.models.CreateEventHubResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateRuleResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateSubscriptionResult;
 import com.microsoft.windowsazure.services.servicebus.models.CreateTopicResult;
+import com.microsoft.windowsazure.services.servicebus.models.EventHubInfo;
+import com.microsoft.windowsazure.services.servicebus.models.GetEventHubResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetQueueResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetRuleResult;
 import com.microsoft.windowsazure.services.servicebus.models.GetSubscriptionResult;
@@ -222,6 +225,85 @@ public interface ServiceBusContract extends
      *             If a service exception is encountered.
      */
     void deleteMessage(BrokeredMessage message) throws ServiceException;
+
+    /**
+     * Creates an event hub.
+     *
+     * @param eventHubInfo
+     *            A <code>EventHubInfo</code> object that represents the event hub to
+     *            create.
+     * @return A <code>EventHubResult</code> object that represents the
+     *         result.
+     * @throws ServiceException
+     *             If a service exception is encountered.
+     */
+    CreateEventHubResult createEventHub(EventHubInfo eventHubInfo) throws ServiceException;
+
+
+    /**
+     * Deletes an event hub.
+     *
+     * @param eventHubPath
+     *            A <code>String</code> object that represents the name of the
+     *            event hub to delete.
+     * @throws ServiceException
+     *             If a service exception is encountered.
+     */
+    void deleteEventHub(String eventHubPath) throws ServiceException;
+
+    /**
+     * Retrieves an event hub.
+     *
+     * @param eventHubPath
+     *            A <code>String</code> object that represents the name of the
+     *            event hub to retrieve.
+     * @return A <code>GetEventHubResult</code> object that represents the result.
+     * @throws ServiceException
+     *             If a service exception is encountered.
+     */
+    GetEventHubResult getEventHub(String eventHubPath) throws ServiceException;
+
+
+/*
+* List EventHubs not part of REST Api
+*       /**
+     * Returns a list of event hubs.
+     *
+     * @return A <code>ListEventHubsResult</code> object that represents the
+     *         result.
+     * @throws ServiceException
+     *             If a service exception is encountered.
+     *//*
+    ListEventHubsResult listEventHubs() throws ServiceException;
+
+    *//**
+     * Returns a list of eventHubs.
+     *
+     * @param options
+     *            A <code>ListEventHubsOptions</code> object that represents the
+     *            options to list the event hubs.
+     * @return A <code>ListEventHubsResults</code> object that represents the
+     *         result.
+     * @throws ServiceException
+     *             If a service exception is encountered.
+     *//*
+    ListEventHubsResult listEventHubs(ListEventHubsOptions options)
+            throws ServiceException;*/
+
+    /**
+     * Updates the information of an event hub.
+     *
+     * @param eventHubInfo
+     *            The information of an event hub to be updated.
+     *
+     * @return A <code>EventHubInfo</code> object that represents the updated
+     *         queue.
+     *
+     * @throws ServiceException
+     *             If a service exception is encountered.
+     */
+    EventHubInfo updateEventHub(EventHubInfo eventHubInfo) throws ServiceException;
+
 
     /**
      * Creates a queue.

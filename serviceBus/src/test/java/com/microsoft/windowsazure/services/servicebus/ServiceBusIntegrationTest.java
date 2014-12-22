@@ -30,9 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.microsoft.windowsazure.services.servicebus.models.*;
+import org.junit.*;
 
 import com.microsoft.windowsazure.services.servicebus.implementation.CorrelationFilter;
 import com.microsoft.windowsazure.services.servicebus.implementation.EmptyRuleAction;
@@ -43,24 +42,11 @@ import com.microsoft.windowsazure.services.servicebus.implementation.RuleDescrip
 import com.microsoft.windowsazure.services.servicebus.implementation.SqlFilter;
 import com.microsoft.windowsazure.services.servicebus.implementation.SqlRuleAction;
 import com.microsoft.windowsazure.services.servicebus.implementation.TrueFilter;
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
-import com.microsoft.windowsazure.services.servicebus.models.GetQueueResult;
-import com.microsoft.windowsazure.services.servicebus.models.ListQueuesResult;
-import com.microsoft.windowsazure.services.servicebus.models.ListRulesResult;
-import com.microsoft.windowsazure.services.servicebus.models.ListSubscriptionsResult;
-import com.microsoft.windowsazure.services.servicebus.models.ListTopicsOptions;
-import com.microsoft.windowsazure.services.servicebus.models.ListTopicsResult;
-import com.microsoft.windowsazure.services.servicebus.models.QueueInfo;
-import com.microsoft.windowsazure.services.servicebus.models.ReceiveMessageOptions;
-import com.microsoft.windowsazure.services.servicebus.models.ReceiveQueueMessageResult;
-import com.microsoft.windowsazure.services.servicebus.models.ReceiveSubscriptionMessageResult;
-import com.microsoft.windowsazure.services.servicebus.models.RuleInfo;
-import com.microsoft.windowsazure.services.servicebus.models.SubscriptionInfo;
-import com.microsoft.windowsazure.services.servicebus.models.TopicInfo;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 
 public class ServiceBusIntegrationTest extends IntegrationTestBase {
+
 
     private ServiceBusContract service;
 
@@ -68,6 +54,7 @@ public class ServiceBusIntegrationTest extends IntegrationTestBase {
             .setReceiveAndDelete().setTimeout(5);
     static ReceiveMessageOptions PEEK_LOCK_5_SECONDS = new ReceiveMessageOptions()
             .setPeekLock().setTimeout(5);
+
 
     private String createLongString(int length) {
         String result = "";
@@ -100,6 +87,90 @@ public class ServiceBusIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    public void createEventHubWorks() throws Exception {
+        // Arrange
+
+        // Act
+        EventHubInfo eventHub = new EventHubInfo("TestCreateEventHubWorks")
+                .setMessageRetentionInDays(2)
+                .setPartitionCount(12);
+
+        EventHubInfo saved = service.createEventHub(eventHub).getValue();
+
+        // Assert
+        assertNotNull(saved);
+        assertNotSame(eventHub, saved);
+        assertEquals(new Integer(12), saved.getPartitionCount());
+        assertEquals(new Integer(2), saved.getMessageRetentionInDays());
+        assertEquals(EntityStatus.ACTIVE, saved.getStatus());
+        assertEquals(null, saved.getUserMetadata());
+        assertEquals("TestCreateEventHubWorks", saved.getPath());
+        try {
+           service.deleteEventHub(saved.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void updateEventHubWorks() throws Exception {
+        // Arrange
+        EventHubInfo eventHub = new EventHubInfo("UpdateEventQueueWorks")
+                .setMessageRetentionInDays(2)
+                .setPartitionCount(12);
+        EventHubInfo originalEventHub = service.createEventHub(eventHub).getValue();
+        Integer expectedMessageRetentionInDays = 5;
+        Integer expectedPartitionCount = 12;
+
+        // Act
+        EventHubInfo updateEventHub = service.updateEventHub(originalEventHub
+                .setMessageRetentionInDays(expectedMessageRetentionInDays)
+                .setPartitionCount(expectedPartitionCount));
+
+        // Assert
+        assertEquals(expectedMessageRetentionInDays,
+                updateEventHub.getMessageRetentionInDays());
+        assertEquals(expectedPartitionCount,
+                updateEventHub.getPartitionCount());
+    }
+
+    @Test
+    public void getEventHubWorks() throws Exception {
+        // Arrange
+        String eventHubPath = "TestEventHubWorks";
+        EventHubInfo testHub = service.createEventHub(new EventHubInfo(eventHubPath))
+                .getValue();
+
+        // Act
+        GetEventHubResult getEventHubResult = service.getEventHub(testHub.getPath());
+
+        // Assert
+        assertNotNull(getEventHubResult);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void getNonExistentEventHubFails() throws Exception {
+        // Arrange
+        String eventHubPath = "testGetNonExistentEventHubFail";
+
+        // Act
+        service.getEventHub(eventHubPath);
+
+        // Assert
+    }
+
+    @Test
+    public void deleteEventHubWorks() throws Exception {
+        // Arrange
+        service.createEventHub(new EventHubInfo("TestDeleteEventHubWorks"));
+
+        // Act
+        service.deleteEventHub("TestDeleteEventHubWorks");
+
+        // Assert
+    }
+
+    @Test
     public void fetchQueueAndListQueuesWorks() throws Exception {
         // Arrange
 
@@ -117,7 +188,7 @@ public class ServiceBusIntegrationTest extends IntegrationTestBase {
         // Arrange
 
         // Act
-        QueueInfo queue = new QueueInfo("TestCreateQueueWorks")
+        QueueInfo queue = new QueueInfo("TestCreateQueueWorks1")
                 .setMaxSizeInMegabytes(1024L);
         QueueInfo saved = service.createQueue(queue).getValue();
 
@@ -128,7 +199,12 @@ public class ServiceBusIntegrationTest extends IntegrationTestBase {
         assertEquals(false, saved.isAnonymousAccessible());
         assertNotNull(saved.getAutoDeleteOnIdle());
         assertEquals(true, saved.isSupportOrdering());
-        assertEquals("TestCreateQueueWorks", saved.getPath());
+        assertEquals("TestCreateQueueWorks1", saved.getPath());
+        try {
+            service.deleteQueue(saved.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
