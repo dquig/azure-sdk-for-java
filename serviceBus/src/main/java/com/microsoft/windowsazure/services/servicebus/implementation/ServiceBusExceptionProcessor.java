@@ -231,6 +231,8 @@ public class ServiceBusExceptionProcessor implements ServiceBusContract {
     public GetEventHubResult getEventHub(String eventHubPath) throws ServiceException {
        try {
             return next.getEventHub(eventHubPath);
+        } catch (WebApplicationException e) {
+            throw processCatch(new ServiceException(e));
         } catch (UniformInterfaceException e) {
             throw processCatch(new ServiceException(e));
         } catch (ClientHandlerException e) {
