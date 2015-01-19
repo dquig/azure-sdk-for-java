@@ -18,7 +18,7 @@
   <parent>
     <groupId>com.microsoft.azure</groupId>
     <artifactId>azure</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.0-foghorn</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
 
@@ -70,6 +70,12 @@
     </dependency>
 
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>azure-core</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+    </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
