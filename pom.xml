@@ -37,6 +37,15 @@
     <connection>scm:git:git://github.com/Azure/azure-sdk-for-java.git</connection>
   </scm>
 
+  <distributionManagement>
+    <repository>
+        <id>central</id>
+        <name>libs-release</name>
+        <url>http://artifactory.foghorn-systems.com:8080/artifactory/ext-release-local</url>
+    </repository>
+</distributionManagement>
+
+
   <properties>
     <projectVersion>0.7.0-foghorn</projectVersion>
   </properties>
