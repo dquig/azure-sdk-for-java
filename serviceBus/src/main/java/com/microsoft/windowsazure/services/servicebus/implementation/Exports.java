@@ -19,6 +19,7 @@ import com.microsoft.windowsazure.core.utils.ConnectionStringSyntaxException;
 
 import static com.microsoft.windowsazure.core.utils.ExportUtils.getPropertyIfExists;
 
+import com.microsoft.windowsazure.credentials.CertificateCloudCredentials;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
 
 import java.net.URISyntaxException;
@@ -32,7 +33,7 @@ public class Exports implements Builder.Exports {
         registry.add(WrapTokenManager.class);
         registry.add(WrapFilter.class);
         registry.add(SasFilter.class);
-
+        registry.add(CertificateCloudCredentials.class);
         registry.add(new Builder.Factory<ServiceBusConnectionSettings>() {
 
             @Override

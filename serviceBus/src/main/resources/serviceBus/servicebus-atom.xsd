@@ -30,6 +30,7 @@
 	</xs:element>
 	<xs:complexType name="content">
 		<xs:sequence>
+			<xs:element ref="sb:NamespaceDescription" minOccurs="0" />
             <xs:element ref="sb:EventHubDescription" minOccurs="0" />
 			<xs:element ref="sb:QueueDescription" minOccurs="0" />
 			<xs:element ref="sb:TopicDescription" minOccurs="0" />

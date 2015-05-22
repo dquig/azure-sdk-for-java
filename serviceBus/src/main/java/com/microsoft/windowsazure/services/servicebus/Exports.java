@@ -16,15 +16,21 @@ package com.microsoft.windowsazure.services.servicebus;
 
 import com.microsoft.windowsazure.core.Builder;
 import com.microsoft.windowsazure.core.UserAgentFilter;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
-import com.microsoft.windowsazure.services.servicebus.implementation.BrokerPropertiesMapper;
-import com.microsoft.windowsazure.services.servicebus.implementation.EntryModelProvider;
-import com.microsoft.windowsazure.services.servicebus.implementation.MarshallerProvider;
-import com.microsoft.windowsazure.services.servicebus.implementation.ServiceBusExceptionProcessor;
-import com.microsoft.windowsazure.services.servicebus.implementation.ServiceBusRestProxy;
+import com.microsoft.windowsazure.core.utils.KeyStoreType;
+import com.microsoft.windowsazure.core.utils.SSLContextFactory;
+import com.microsoft.windowsazure.credentials.CertificateCloudCredentials;
+import com.microsoft.windowsazure.management.configuration.ManagementConfiguration;
+import com.microsoft.windowsazure.services.servicebus.implementation.*;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
+
+import javax.net.ssl.SSLContext;
 
 public class Exports implements Builder.Exports {
     @Override
@@ -35,6 +41,12 @@ public class Exports implements Builder.Exports {
                 ServiceBusExceptionProcessor.class);
         registry.add(ServiceBusExceptionProcessor.class);
         registry.add(ServiceBusRestProxy.class);
+
+        registry.add(NamespaceContract.class,
+                NamespaceExceptionProcessor.class);
+        registry.add(NamespaceExceptionProcessor.class);
+        registry.add(NamespaceRestProxy.class);
+
         registry.add(UserAgentFilter.class);
 
         // alter jersey client config for serviceBus
@@ -45,6 +57,52 @@ public class Exports implements Builder.Exports {
                     public ClientConfig alter(String profile,
                             ClientConfig instance, Builder builder,
                             Map<String, Object> properties) {
+
+                        // enable this feature for unattributed json object
+                        // serialization
+                        instance.getProperties().put(
+                                JSONConfiguration.FEATURE_POJO_MAPPING, true);
+
+                        // need to avoid certain element prefixes, which the
+                        // service does not ignore
+                        instance.getSingletons().add(new MarshallerProvider());
+
+                        // add body reader/writer for EntryModel<?> descendant
+                        // classes
+                        instance.getClasses().add(EntryModelProvider.class);
+
+                        return instance;
+                    }
+                });
+
+        registry.alter(NamespaceContract.class, ClientConfig.class,
+                new Builder.Alteration<ClientConfig>() {
+
+                    @Override
+                    public ClientConfig alter(String profile,
+                                              ClientConfig instance, Builder builder,
+                                              Map<String, Object> properties) {
+                        String truststore_path = "/Users/dave/certs/azure-remote-access.jks";
+                        String truststore_password = "password";
+                        String keystore_path = "/Users/dave/certs/azure-remote-access.jks";
+                        String keystore_password = "password";
+
+                        HTTPSProperties prop = null;
+                        try {
+                            prop = new HTTPSProperties(null,
+                                    SSLContextFactory.create(
+                                            properties.get(ManagementConfiguration.KEYSTORE_PATH).toString(),
+                                            properties.get(ManagementConfiguration.KEYSTORE_PASSWORD).toString(),
+                                            KeyStoreType.fromString(properties.get(ManagementConfiguration.KEYSTORE_TYPE).toString())
+                                    )
+                            );
+                        } catch (GeneralSecurityException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        instance.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, prop);
 
                         // enable this feature for unattributed json object
                         // serialization

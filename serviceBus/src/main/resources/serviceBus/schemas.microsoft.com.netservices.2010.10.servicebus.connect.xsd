@@ -66,6 +66,67 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="EventHubDescription" type="tns:EventHubDescription" />
+  <xs:complexType name="NamespaceDescription">
+    <xs:sequence>
+      <xs:element minOccurs="1" name="Region" type="tns:Region">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="DefaultKey" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="CreatedAt" type="xs:dateTime">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Status" type="tns:NamespaceStatus">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="AcsManagementEndpoint" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="ServiceBusEndpoint" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="ConnectionString" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="NamespaceType" type="tns:NamespaceType">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NamespaceDescription" type="tns:NamespaceDescription" />
   <xs:complexType name="QueueDescription">
     <xs:sequence>
       <xs:element minOccurs="0" name="LockDuration" type="ser:duration">
@@ -439,6 +500,32 @@
       <xs:enumeration value="Manage" />
       <xs:enumeration value="Send" />
       <xs:enumeration value="Listen" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Region">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value ="East Asia" />
+      <xs:enumeration value ="North Europe" />
+      <xs:enumeration value="West Europe" />
+      <xs:enumeration value="East US" />
+      <xs:enumeration value ="Southeast Asia" />
+      <xs:enumeration value ="North Central US" />
+      <xs:enumeration value="West US" />
+      <xs:enumeration value="South Central US" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NamespaceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value ="Messaging" />
+      <xs:enumeration value ="Notification Hub" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NamespaceStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value ="Created/Active" />
+      <xs:enumeration value ="Creating" />
+      <xs:enumeration value="Suspended" />
+      <xs:enumeration value="Deleting" />
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="EntityStatus">
